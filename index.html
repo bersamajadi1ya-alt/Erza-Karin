@@ -829,6 +829,7 @@
     // SEND WISH (Terhubung ke Google Sheets & Tampil Langsung)
     function sendWish() {
       const name = document.getElementById("guestName").value.trim();
+      const status = document.getElementById("guestStatus") ? document.getElementById("guestStatus").value : 'Hadir'; 
       const message = document.getElementById("guestMessage").value.trim();
 
       if (name === "" || message === "") {
@@ -836,17 +837,12 @@
         return;
       }
 
-      // 1. Tampilkan Ucapan Langsung di Halaman Web
+      // Tampilkan ucapan langsung di halaman web
       const feed = document.getElementById("wishesFeed");
       const newCard = document.createElement("div");
       newCard.className = "wish-card";
-      newCard.innerHTML = `<strong>${escapeHtml(name)}</strong><p>${escapeHtml(message)}</p>`;
+      newCard.innerHTML = `<strong>${escapeHtml(name)} (${escapeHtml(status)})</strong><p>${escapeHtml(message)}</p>`;
       feed.prepend(newCard);
-
-      // 2. Simpan juga ke Local Storage HP
-      const localWishes = JSON.parse(localStorage.getItem("weddingWishes")) || [];
-      localWishes.unshift({ name: name, message: message });
-      localStorage.setItem("weddingWishes", JSON.stringify(localWishes));
 
       // Reset Form Input
       document.getElementById("guestName").value = "";
@@ -854,7 +850,7 @@
 
       showModal("Terimakasih atas doa & ucapan ✨, panjang umur untuk semua hal-hal baik");
 
-      // 3. KIRIM DATA KE GOOGLE SPREADSHEET VIA WEB APP URL
+      // Kirim data ke Google Spreadsheet
       const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4f_C95nLjsm5vhKDsrO1zzhoqjqe70M5cQEyp-CwpbIwTQ9_WEhbXAzLj5F0TsRIq/exec';
 
       fetch(SCRIPT_URL, {
@@ -865,7 +861,7 @@
         },
         body: JSON.stringify({
           nama: name,
-          kehadiran: 'Hadir',
+          kehadiran: status,
           ucapan: message
         })
       })
