@@ -826,6 +826,7 @@
     }
 
     // SEND WISH
+    // SEND WISH (Terhubung ke Google Sheets & Tampil Langsung)
     function sendWish() {
       const name = document.getElementById("guestName").value.trim();
       const message = document.getElementById("guestMessage").value.trim();
@@ -835,29 +836,45 @@
         return;
       }
 
+      // 1. Tampilkan Ucapan Langsung di Halaman Web
       const feed = document.getElementById("wishesFeed");
       const newCard = document.createElement("div");
       newCard.className = "wish-card";
       newCard.innerHTML = `<strong>${escapeHtml(name)}</strong><p>${escapeHtml(message)}</p>`;
       feed.prepend(newCard);
 
-      const localWishes = JSON.parse(localStorage.getItem("weddingWishes")) || [
-        { name: "Pak Jokowi", message: "Selamat untuk Erza & Karina! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah." },
-        { name: "Santri NU", message: "Ampun supe tahlil rien, sak durunge Allohumma janibne hehe......" },
-        { name: "Kang Wo", message: "HIDUP UNTUK SEMUA HAL BAIK, Selamat zaa......" },
-        { name: "Mas Gibran", message: "Selamat menempuh hidup baru, semoga bahagia selalu sampai kakek nenek." }
-      ];
+      // 2. Simpan juga ke Local Storage HP
+      const localWishes = JSON.parse(localStorage.getItem("weddingWishes")) || [];
       localWishes.unshift({ name: name, message: message });
       localStorage.setItem("weddingWishes", JSON.stringify(localWishes));
 
+      // Reset Form Input
       document.getElementById("guestName").value = "";
       document.getElementById("guestMessage").value = "";
 
       showModal("Terimakasih atas doa & ucapan ✨, panjang umur untuk semua hal-hal baik");
 
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.saveWish(name, message);
-      }
+      // 3. KIRIM DATA KE GOOGLE SPREADSHEET VIA WEB APP URL
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4f_C95nLjsm5vhKDsrO1zzhoqjqe70M5cQEyp-CwpbIwTQ9_WEhbXAzLj5F0TsRIq/exec';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nama: name,
+          kehadiran: 'Hadir',
+          ucapan: message
+        })
+      })
+      .then(() => {
+        console.log("Berhasil terkirim ke Google Sheets!");
+      })
+      .catch(error => {
+        console.error("Gagal mengirim ke Google Sheets:", error);
+      });
     }
 
     function showModal(msgText) {
