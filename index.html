@@ -2,13 +2,13 @@
 <html lang="id">
 
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <!-- Meta Tag Preview WhatsApp -->
-<meta property="og:title" content="The Wedding of Erza & Karina" />
-<meta property="og:description" content="Ahad, 20 Desember 2026" />
-<meta property="og:image" content="https://files.catbox.moe/xgsgr1.jpg" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
+  <meta property="og:title" content="The Wedding of Erza & Karina" />
+  <meta property="og:description" content="Ahad, 20 Desember 2026" />
+  <meta property="og:image" content="https://files.catbox.moe/xgsgr1.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -363,10 +363,11 @@
       border-radius: 20px;
       border: 1px solid #f0f0f0;
       box-shadow: var(--shadow);
-      margin-bottom: 20px;
+      margin: 0 auto 20px auto;
+      max-width: 500px;
     }
 
-    input, textarea {
+    input, select, textarea {
       width: 100%;
       padding: 12px;
       margin-bottom: 12px;
@@ -374,6 +375,7 @@
       border: 1px solid #ddd;
       font-family: 'Montserrat', sans-serif;
       font-size: 13px;
+      background: #ffffff;
     }
 
     textarea { height: 90px; resize: none; }
@@ -384,8 +386,8 @@
       padding: 18px;
       border: 1px solid #f0f0f0;
       box-shadow: var(--shadow);
-      margin-bottom: 25px;
-      overflow: visible;
+      margin: 0 auto 25px auto;
+      max-width: 500px;
     }
 
     .wishes-container h3 {
@@ -400,6 +402,18 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .wishes-feed::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .wishes-feed::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 10px;
     }
 
     .wish-card {
@@ -651,6 +665,11 @@
         <!-- FORM KIRIM UCAPAN -->
         <div class="form-box">
           <input id="guestName" type="text" placeholder="Nama Anda">
+          <select id="guestStatus">
+            <option value="Hadir">Hadir</option>
+            <option value="Tidak Hadir">Tidak Hadir</option>
+            <option value="Ragu-ragu">Ragu-ragu</option>
+          </select>
           <textarea id="guestMessage" placeholder="Tuliskan doa restu terbaik Anda"></textarea>
           <button onclick="sendWish()" class="send-btn">
             <i class="fa-solid fa-pen"></i> Kirim Ucapan
@@ -662,22 +681,21 @@
           <h3>Doa & Ucapan Teman/Kerabat</h3>
           <div class="wishes-feed" id="wishesFeed">
             <div class="wish-card">
-              <strong>Pak Jokowi</strong>
+              <strong>Pak Jokowi (Hadir)</strong>
               <p>Selamat untuk Erza & Karina! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.</p>
             </div>
             <div class="wish-card">
-              <strong>Santri NU</strong>
+              <strong>Santri NU (Hadir)</strong>
               <p>Ampun supe tahlil rien, sak durunge Allohumma janibne hehe.....</p>
             </div>
             <div class="wish-card">
-              <strong>Mas Gibran</strong>
+              <strong>Mas Gibran (Hadir)</strong>
               <p>Selamat menempuh hidup baru, semoga bahagia selalu sampai kakek nenek.</p>
             </div>  
-          <div class="wish-card">
-              <strong>Kang Wo</strong>
+            <div class="wish-card">
+              <strong>Kang Wo (Hadir)</strong>
               <p>HIDUP UNTUK SEMUA HAL BAIK, Selamat zaa.</p>
-              
-        </div>
+            </div>
           </div>
         </div>
 
@@ -710,7 +728,7 @@
         <i class="fa-solid fa-hands-praying"></i>
         <h1>Terima Kasih</h1>
         <p>
-          Terimakasih atas doa/ucapan dan kehadiran bapak/ibu/saudara/i, .
+          Terimakasih atas doa/ucapan dan kehadiran bapak/ibu/saudara/i.
         </p>
         <h2>Erza & Karina</h2>
         <button class="main-btn" onclick="restartInvitation()">
@@ -727,6 +745,8 @@
     const slides = document.querySelectorAll(".slide");
     const music = document.getElementById("music");
     let musicPlaying = false;
+
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4f_C95nLjsm5vhKDsrO1zzhoqjqe70M5cQEyp-CwpbIwTQ9_WEhbXAzLj5F0TsRIq/exec';
 
     function openInvitation() {
       showSlide(1);
@@ -798,20 +818,21 @@
     countdown(new Date("December 17, 2026 08:00:00").getTime(), "akadCountdown");
     countdown(new Date("December 20, 2026 10:00:00").getTime(), "resepsiCountdown");
 
-    // LOAD UCAPAN
+    // LOAD UCAPAN (Ambil dari Google Sheets secara real-time)
     function loadWishes() {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(wishes) {
+      fetch(SCRIPT_URL)
+        .then(response => response.json())
+        .then(wishes => {
           if (wishes && wishes.length > 0) {
             renderWishes(wishes);
           }
-        }).getWishes();
-      } else {
-        const savedWishes = JSON.parse(localStorage.getItem("weddingWishes")) || [];
-        if (savedWishes.length > 0) {
-          renderWishes(savedWishes);
-        }
-      }
+        })
+        .catch(err => {
+          const savedWishes = JSON.parse(localStorage.getItem("weddingWishes")) || [];
+          if (savedWishes.length > 0) {
+            renderWishes(savedWishes);
+          }
+        });
     }
 
     function renderWishes(wishes) {
@@ -820,13 +841,17 @@
       wishes.forEach(function(item) {
         const card = document.createElement("div");
         card.className = "wish-card";
-        card.innerHTML = `<strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.message)}</p>`;
+        const nama = item.nama || item.name || "Tamu";
+        const status = item.kehadiran || item.status || "";
+        const ucapan = item.ucapan || item.message || "";
+        
+        const statusText = status ? ` (${escapeHtml(status)})` : "";
+        card.innerHTML = `<strong>${escapeHtml(nama)}${statusText}</strong><p>${escapeHtml(ucapan)}</p>`;
         feed.appendChild(card);
       });
     }
 
-    // SEND WISH
-    // SEND WISH (Terhubung ke Google Sheets & Tampil Langsung)
+    // SEND WISH (Kirim ke Google Sheets & Langsung Tampil)
     function sendWish() {
       const name = document.getElementById("guestName").value.trim();
       const status = document.getElementById("guestStatus") ? document.getElementById("guestStatus").value : 'Hadir'; 
@@ -837,7 +862,7 @@
         return;
       }
 
-      // Tampilkan ucapan langsung di halaman web
+      // Tampilkan ucapan langsung di paling atas
       const feed = document.getElementById("wishesFeed");
       const newCard = document.createElement("div");
       newCard.className = "wish-card";
@@ -851,8 +876,6 @@
       showModal("Terimakasih atas doa & ucapan ✨, panjang umur untuk semua hal-hal baik");
 
       // Kirim data ke Google Spreadsheet
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4f_C95nLjsm5vhKDsrO1zzhoqjqe70M5cQEyp-CwpbIwTQ9_WEhbXAzLj5F0TsRIq/exec';
-
       fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -905,26 +928,29 @@
       loadWishes();
     };
   </script>
+
+  <style>
+    /* Menyesuaikan lebar website agar pas di HP */
+    html, body {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 auto !important;
+      overflow-x: hidden !important;
+    }
+
+    /* Membatasi elemen pembungkus utama */
+    .container, .wrapper, section, div {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Memastikan gambar & media menyesuaikan layar */
+    img, svg, iframe {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+
 </body>
-<style>
-  /* Menyesuaikan lebar website agar pas di HP */
-  html, body {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    overflow-x: hidden !important;
-  }
 
-  /* Membatasi elemen pembungkus utama */
-  .container, .wrapper, section, div {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Memastikan gambar & media menyesuaikan layar */
-  img, svg, iframe {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-</style>
 </html>
