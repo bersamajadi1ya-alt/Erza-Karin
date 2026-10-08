@@ -405,6 +405,7 @@
       max-height: 280px;
       overflow-y: auto;
       padding-right: 5px;
+      scroll-behavior: smooth;
     }
 
     .wishes-feed::-webkit-scrollbar {
@@ -422,6 +423,18 @@
       padding: 10px 14px;
       border-radius: 8px;
       text-align: left;
+      animation: slideInDown 0.6s ease-out forwards;
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .wish-card strong { font-size: 13px; color: var(--secondary); display: block; margin-bottom: 3px; }
@@ -616,7 +629,7 @@
 
         <!-- AKAD -->
         <div class="event-wrapper">
-          <img src="https://files.catbox.moe/8asxa1.jpg" alt="Foto Galeri Akad" class="event-photo">
+          <img src="https://files.catbox.moe/tpy63v.png" alt="Foto Galeri Akad" class="event-photo">
           <div class="event-card">
             <i class="fa-solid fa-calendar-days event-icon"></i>
             <h3>Intimate Akad Nikah</h3>
@@ -632,7 +645,7 @@
 
         <!-- RESEPSI -->
         <div class="event-wrapper">
-          <img src="https://files.catbox.moe/8asxa1.jpg" alt="Foto Galeri Resepsi" class="event-photo">
+          <img src="https://files.catbox.moe/3v3jeg.png" alt="Foto Galeri Resepsi" class="event-photo">
           <div class="event-card">
             <i class="fa-solid fa-clock event-icon"></i>
             <h3>Resepsi & Tasyakuran</h3>
@@ -851,7 +864,32 @@
       });
     }
 
-    // SEND WISH (Kirim ke Google Sheets & Langsung Tampil)
+    // Fungsi Animasi Gulir Otomatis (Slow Smooth Scroll ke Bawah)
+    function smoothScrollToBottom(element, duration) {
+      const start = element.scrollTop;
+      const target = element.scrollHeight - element.clientHeight;
+      const change = target - start;
+      let startTime = null;
+
+      function animateScroll(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        
+        // Easing function untuk gerakan yang halus
+        const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+        
+        element.scrollTop = start + change * ease;
+
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animateScroll);
+        }
+      }
+
+      requestAnimationFrame(animateScroll);
+    }
+
+    // SEND WISH (Kirim ke Google Sheets & Animasi Bergulir Kebawah)
     function sendWish() {
       const name = document.getElementById("guestName").value.trim();
       const status = document.getElementById("guestStatus") ? document.getElementById("guestStatus").value : 'Hadir'; 
@@ -862,12 +900,21 @@
         return;
       }
 
-      // Tampilkan ucapan langsung di paling atas
       const feed = document.getElementById("wishesFeed");
+      
+      // Tambahkan pesan baru ke posisi paling atas
       const newCard = document.createElement("div");
       newCard.className = "wish-card";
       newCard.innerHTML = `<strong>${escapeHtml(name)} (${escapeHtml(status)})</strong><p>${escapeHtml(message)}</p>`;
       feed.prepend(newCard);
+
+      // Pastikan posisi scroll mulai dari atas sebelum animasi bergulir kebawah
+      feed.scrollTop = 0;
+
+      // Beri sedikit jeda agar elemen baru selesai dirender, lalu gulir secara perlahan ke bawah
+      setTimeout(() => {
+        smoothScrollToBottom(feed, 2500); // Durasi gulir: 2.5 detik
+      }, 300);
 
       // Reset Form Input
       document.getElementById("guestName").value = "";
