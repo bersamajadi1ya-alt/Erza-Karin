@@ -440,8 +440,8 @@
     .wish-card strong { font-size: 13px; color: var(--secondary); display: block; margin-bottom: 3px; }
     .wish-card p { font-size: 12px; color: #444; line-height: 1.4; }
 
-    /* DIGITAL GIFT */
-    .gift-box {
+    /* DIRECT MESSAGE BOX */
+    .message-box {
       margin: 20px auto;
       background: linear-gradient(135deg, #10367D, #1d5ab3);
       color: white;
@@ -451,21 +451,28 @@
       animation: giftGlow 3s infinite;
     }
 
-    .gift-box i.gift-icon { font-size: 32px; color: #fff; }
-    .gift-box h3 { font-size: 16px; margin-top: 5px; }
-    .gift-note { font-size: 11px; font-style: italic; opacity: 0.85; margin: 6px 0 12px 0; font-weight: 300; }
-    .gift-box h2 { margin: 10px 0 15px 0; letter-spacing: 2px; font-size: 20px; }
+    .message-box i.msg-icon { font-size: 32px; color: #fff; }
+    .message-box h3 { font-size: 16px; margin-top: 5px; }
+    .message-note { font-size: 11px; font-style: italic; opacity: 0.85; margin: 6px 0 15px 0; font-weight: 300; }
 
-    #copyBtn {
+    #waBtn {
       background: white;
       color: var(--secondary);
-      padding: 8px 18px;
+      padding: 10px 22px;
       border-radius: 30px;
       font-size: 12px;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: 0.3s;
     }
 
-    .copy-success { background: var(--accent) !important; color: #10367D !important; }
+    #waBtn:hover {
+      background: var(--accent);
+      color: #10367D;
+    }
 
     @keyframes giftGlow {
       50% { box-shadow: 0 0 25px rgba(0, 210, 255, 0.6); }
@@ -669,7 +676,7 @@
       </div>
     </section>
 
-    <!-- SLIDE 3: UCAPAN & TANDA KASIH -->
+    <!-- SLIDE 3: UCAPAN & KIRIM PESAN -->
     <section class="slide" id="wish">
       <div class="page-content">
         <i class="fa-solid fa-comment-dots section-icon"></i>
@@ -712,18 +719,15 @@
           </div>
         </div>
 
-        <!-- AMPLOP DIGITAL -->
-        <div class="gift-box">
-          <i class="fa-solid fa-wallet gift-icon"></i>
-          <h3>Tanda Kasih Digital</h3>
-          <p class="gift-note">DANA / OVO / GoPay</p>
-          <p class="gift-note">Tanpa mengurangi rasa hormat, bagi Anda yang ingin membagikan kebahagiaan dan memberikan tanda kasih, dapat melalui E-wallet berikut. Terima kasih atas perhatian dan doa terbaiknya</p>
+        <!-- KIRIM PESAN LANGSUNG -->
+        <div class="message-box">
+          <i class="fa-solid fa-paper-plane msg-icon"></i>
+          <h3>Kirim Pesan Langsung</h3>
+          <p class="message-note">Tanpa mengurangi rasa hormat, bagi Anda yang ingin mengirimkan pesan atau konfirmasi kehadiran secara langsung melalui WhatsApp.</p>
           
-          <h2 id="wallet">0878-5034-0256</h2>
-          
-          <button onclick="copyWallet()" id="copyBtn">
-            <i class="fa-solid fa-copy"></i> Salin Nomor
-          </button>
+          <a href="https://wa.me/083879463716" target="_blank" id="waBtn">
+            <i class="fa-brands fa-telegram"></i> Kirim Pesan
+          </a>
         </div>
 
         <button class="back-btn" onclick="prevSlide()">
@@ -956,20 +960,6 @@
       return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
     }
 
-    function copyWallet() {
-      const wallet = document.getElementById("wallet").innerText;
-      navigator.clipboard.writeText(wallet);
-
-      const btn = document.getElementById("copyBtn");
-      btn.classList.add("copy-success");
-      btn.innerHTML = `<i class="fa-solid fa-check"></i> Disalin`;
-
-      setTimeout(() => {
-        btn.classList.remove("copy-success");
-        btn.innerHTML = `<i class="fa-solid fa-copy"></i> Salin Nomor`;
-      }, 3000);
-    }
-
     window.onload = function () {
       showSlide(0);
       loadWishes();
@@ -1000,3 +990,4 @@
 
 </body>
 </html>
+```
